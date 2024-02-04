@@ -83,8 +83,7 @@ const editConsumer = async (req, res) => {
   
       res.json(user.consumers);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Erro ao editar consumidor.' });
+      res.status(500).json({ error: error._message });
     }
   };
 
@@ -110,7 +109,6 @@ const removeConsumer = async (req, res) => {
         await User.updateOne({ _id: userId }, { $set: { consumers: user.consumers } });
         res.json(user.consumers);
     } catch (error) {
-        console.error(error);
         res.status(500).json({ error: error._message });
     }
 };
