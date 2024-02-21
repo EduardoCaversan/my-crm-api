@@ -7,7 +7,7 @@ const getAllUsers = async (req, res) => {
         const users = await User.find();
         res.json(users);
     } catch (error) {
-        res.status(500).json({ error: error._message });
+        res.status(500).json({ responseStatus: 500, error: error._message });
     };
 };
 
@@ -26,53 +26,53 @@ const createUser = async (req, res) => {
         await newUser.save();
         res.status(201).json(newUser);
     } catch (error) {
-        res.status(500).json({ error: error._message });
+        res.status(500).json({ responseStatus: 500, error: error._message });
     };
 };
 
 const deleteUser = async (req, res) => {
     const userId = req.params.userId;
     if (!userId)
-        return res.status(400).json({ error: 'Id do usuário não fornecido.' });
+        return res.status(400).json({ responseStatus: 400, error: 'Id do usuário não fornecido.' });
     try {
         const deletedUser = await User.findByIdAndDelete(userId);
 
         if (!deletedUser) {
-            return res.status(404).json({ error: 'Usuário não encontrado.' });
+            return res.status(404).json({ responseStatus: 404, error: 'Usuário não encontrado.' });
         }
 
         res.json({ message: 'Usuário deletado com sucesso.' });
     } catch (error) {
-        res.status(500).json({ error: error._message });
+        res.status(500).json({ responseStatus: 500, error: error._message });
     };
 };
 
 const listConsumers = async (req, res) => {
     const userId = req.params.userId;
     if (!userId)
-        return res.status(400).json({ error: 'Id do usuário não fornecido.' });
+        return res.status(400).json({ responseStatus: 400, error: 'Id do usuário não fornecido.' });
     try {
         const user = await User.findById(userId);
 
         if (!user) {
-            return res.status(404).json({ error: 'Usuário não encontrado.' });
+            return res.status(404).json({ responseStatus: 404, error: 'Usuário não encontrado.' });
         }
 
         res.status(200).json(user.consumers);
     } catch (error) {
-        res.status(500).json({ error: error._message });
+        res.status(500).json({ responseStatus: 500, error: error._message });
     }
 };
 
 const addConsumer = async (req, res) => {
     const userId = req.params.userId;
     if (!userId)
-        return res.status(400).json({ error: 'Id do usuário não fornecido.' });
+        return res.status(400).json({ responseStatus: 400, error: 'Id do usuário não fornecido.' });
     try {
         const user = await User.findById(userId);
 
         if (!user) {
-            return res.status(404).json({ error: 'Usuário não encontrado.' });
+            return res.status(404).json({ responseStatus: 404, error: 'Usuário não encontrado.' });
         }
 
         const newConsumer = {
@@ -84,7 +84,7 @@ const addConsumer = async (req, res) => {
         await user.save();
         res.status(201).json(user.consumers);
     } catch (error) {
-        res.status(500).json({ error: error._message });
+        res.status(500).json({ responseStatus: 500, error: error._message });
     };
 };
 
@@ -92,20 +92,20 @@ const editConsumer = async (req, res) => {
     const userId = req.params.userId;
     const consumerId = req.params.consumerId;
     if (!userId)
-        return res.status(400).json({ error: 'Id do usuário não fornecido.' });
+        return res.status(400).json({ responseStatus: 400, error: 'Id do usuário não fornecido.' });
     if (!consumerId)
-        return res.status(400).json({ error: 'Id do consumidor não fornecido.' });
+        return res.status(400).json({ responseStatus: 400, error: 'Id do consumidor não fornecido.' });
     try {
         const user = await User.findById(userId);
 
         if (!user) {
-            return res.status(404).json({ error: 'Usuário não encontrado.' });
+            return res.status(404).json({ responseStatus: 404, error: 'Usuário não encontrado.' });
         }
 
         const consumerToEditIndex = user.consumers.findIndex(consumer => consumer._id.toString() === consumerId);
 
         if (consumerToEditIndex === -1) {
-            return res.status(404).json({ error: 'Consumidor não encontrado.' });
+            return res.status(404).json({ responseStatus: 404, error: 'Consumidor não encontrado.' });
         }
 
         user.consumers[consumerToEditIndex].name = req.body.name;
@@ -115,7 +115,7 @@ const editConsumer = async (req, res) => {
 
         res.json(user.consumers);
     } catch (error) {
-        res.status(500).json({ error: error._message });
+        res.status(500).json({ responseStatus: 500, error: error._message });
     };
 };
 
@@ -123,20 +123,20 @@ const removeConsumer = async (req, res) => {
     const userId = req.params.userId;
     const consumerId = req.params.consumerId;
     if (!userId)
-        return res.status(400).json({ error: 'Id do usuário não fornecido.' });
+        return res.status(400).json({ responseStatus: 400, error: 'Id do usuário não fornecido.' });
     if (!consumerId)
-        return res.status(400).json({ error: 'Id do consumidor não fornecido.' });
+        return res.status(400).json({ responseStatus: 400, error: 'Id do consumidor não fornecido.' });
     try {
         const user = await User.findById(userId);
 
         if (!user) {
-            return res.status(404).json({ error: 'Usuário não encontrado.' });
+            return res.status(404).json({ responseStatus: 404, error: 'Usuário não encontrado.' });
         }
 
         const consumerToRemoveIndex = user.consumers.findIndex(consumer => consumer._id.toString() === consumerId);
 
         if (consumerToRemoveIndex === -1) {
-            return res.status(404).json({ error: 'Consumidor não encontrado.' });
+            return res.status(404).json({ responseStatus: 404, error: 'Consumidor não encontrado.' });
         }
 
         user.consumers.splice(consumerToRemoveIndex, 1);
@@ -144,7 +144,7 @@ const removeConsumer = async (req, res) => {
         await User.updateOne({ _id: userId }, { $set: { consumers: user.consumers } });
         res.json(user.consumers);
     } catch (error) {
-        res.status(500).json({ error: error._message });
+        res.status(500).json({ responseStatus: 500, error: error._message });
     };
 };
 
@@ -155,20 +155,20 @@ const loginUser = async (req, res) => {
         const user = await User.findOne({ username });
 
         if (!user) {
-            return res.status(401).json({ error: 'Nome de usuário inválido.' });
+            return res.status(401).json({ responseStatus: 401, error: 'Nome de usuário inválido.' });
         }
 
         const passwordMatch = await bcrypt.compare(password, user.password);
 
         if (!passwordMatch) {
-            return res.status(401).json({ error: 'Senha inválida.' });
+            return res.status(401).json({ responseStatus: 401, error: 'Senha inválida.' });
         }
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
         res.json({ token });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ responseStatus: 500, error: error.message });
     }
 };
 
